@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <string.h>
+
+// Define the maximum number of cities
+#define MAX_CITIES 5
+
+// Structure to store weather data for each city
+struct CityWeather {
+    char cityName[50];
+    float temperature; // Temperature in Celsius
+    char weatherDescription[100];
+};
+
+// Function Declarations
+void displayMenu();
+void addCityWeather(struct CityWeather *city, const char *name, float temperature, const char *description);
+void displayWeather(struct CityWeather cities[], int count);
+int searchCity(struct CityWeather cities[], int count, const char *cityName);
+void predictWeather(float temperature);
+
+int main() {
+    // Array to store weather data for cities
+    struct CityWeather cities[MAX_CITIES];
+    int cityCount = 0;
+    int choice;
+    char cityName[50];
+    int cityIndex;
+
+    // Predefined weather data
+    addCityWeather(&cities[0], "Kolkata", 25.0, "Sunny");
+    addCityWeather(&cities[1], "Mumbai", 18.0, "Cloudy");
+    addCityWeather(&cities[2], "Ahmedabad", 20.0, "Rainy");
+    addCityWeather(&cities[3], "Chennai", 22.0, "Partly Cloudy");
+    addCityWeather(&cities[4], "Delhi", 35.0, "Hot");
+
+    // Main loop to show menu and interact with user
+    while (1) {
+        displayMenu();
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: // Display Weather for All Cities
+                displayWeather(cities, MAX_CITIES);
+                break;
+
+            case 2: // Search Weather by City Name
+                printf("Enter city name to search: ");
+                getchar(); // To consume newline character left by previous input
+                fgets(cityName, sizeof(cityName), stdin);
+                cityName[strcspn(cityName, "\n")] = '\0';  // Remove the newline character
+                
+                cityIndex = searchCity(cities, MAX_CITIES, cityName);
+                if (cityIndex != -1) {
+                    printf("Weather in %s: %.2f°C, %s\n", cities[cityIndex].cityName, cities[cityIndex].temperature, cities[cityIndex].weatherDescription);
+                    predictWeather(cities[cityIndex].temperature);
+                } else {
+                    printf("City not found.\n");
+                }
+                break;
+
+            case 3: // Exit the program
+                printf("Exiting the Weather Prediction program. Goodbye!\n");
+                return 0;
+
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
+
+// Function to display the menu
+void displayMenu() {
+    printf("\nWeather Prediction Program\n");
+    printf("1. Display weather for all cities\n");
+    printf("2. Search weather by city name\n");
+    printf("3. Exit\n");
+    printf("Enter your choice: ");
+}
+
+// Function to add weather data to a city structure
+void addCityWeather(struct CityWeather *city, const char *name, float temperature, const char *description) {
+    strncpy(city->cityName, name, sizeof(city->cityName) - 1);
+    city->temperature = temperature;
+    strncpy(city->weatherDescription, description, sizeof(city->weatherDescription) - 1);
+}
+
+// Function to display weather data for all cities
+void displayWeather(struct CityWeather cities[], int count) {
+    printf("\nWeather data for all cities:\n");
+    for (int i = 0; i < count; i++) {
+        printf("City: %s, Temperature: %.2f°C, Weather: %s\n",
+               cities[i].cityName, cities[i].temperature, cities[i].weatherDescription);
+    }
+}
+
+// Function to search a city by name and return its index
+int searchCity(struct CityWeather cities[], int count, const char *cityName) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(cities[i].cityName, cityName) == 0) {
+            return i; // Found, return the index
+        }
+    }
+    return -1; // Not found
+}
+
+// Function to predict the weather based on the temperature
+void predictWeather(float temperature) {
+    if (temperature < 15.0) {
+        printf("Prediction: It's likely to be cold. Consider wearing warm clothes.\n");
+    } else if (temperature >= 15.0 && temperature <= 25.0) {
+        printf("Prediction: The weather seems moderate. A light jacket might be needed.\n");
+    } else if (temperature > 25.0 && temperature <= 35.0) {
+        printf("Prediction: It's likely to be warm. Stay hydrated and wear light clothing.\n");
+    } else {
+        printf("Prediction: It's likely to be hot. Stay indoors and keep cool.\n");
+    }
+}
